@@ -115,9 +115,9 @@ function siguienteRonda(){
 
     const disponibles = imagenes.filter(i => !usadas.has(i));
 
-    actuales = [...disponibles]
-        .sort(() => Math.random() - 0.5)
-        .slice(0,4);
+   actuales = [...disponibles]
+    .sort(() => Math.random() - 0.5)
+    .slice(0,1);
 
     actuales.forEach(i => usadas.add(i));
 
@@ -189,7 +189,7 @@ function skip(){
 
     setTimeout(() => {
         siguienteRonda();
-    }, 1200);
+    }, 1900);
 }
 
 </script>
