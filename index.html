@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prática de Português</title>
+<title>Практика русского языка</title>
 
-
-    
 <style>
 body{
     font-family: Arial, sans-serif;
@@ -25,19 +23,19 @@ h1{
 }
 
 .grid{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:20px auto;
 }
 
 .card{
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 15px;
-    width: 300px;
-    text-align: center;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:10px;
+    padding:15px;
+    width:300px;
+    text-align:center;
 }
 
 .card img{
@@ -73,13 +71,13 @@ button{
 </head>
 <body>
 
-<h1>Escreva a palavra em português</h1>
+<h1>Напишите слово по-русски</h1>
 
-<div id="info">Carregando...</div>
+<div id="info">Загрузка...</div>
 
 <div class="grid" id="grid"></div>
 
-<button onclick="skip()">Skip</button>
+<button onclick="skip()">Пропустить</button>
 
 <script>
 
@@ -87,110 +85,97 @@ const carpeta = "cards/";
 let imagenes = [];
 let actuales = [];
 let usadas = new Set();
-let completadas = 0;
 
 // Normalizar texto
 function normalizar(texto){
     return texto
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[\u0300-\u036f]/g,"")
         .trim();
 }
 
 // Cargar JSON
 fetch("imagenes.json")
 .then(r => r.json())
-.then(data => {
+.then(data=>{
     imagenes = data;
     siguienteRonda();
 });
 
-// Crear nueva ronda
+// Nueva ronda
 function siguienteRonda(){
 
     if(usadas.size === imagenes.length){
-        document.getElementById("info").innerText = "¡Terminaste todas!";
+        document.getElementById("info").innerText = "Вы закончили все карточки!";
         return;
     }
 
-    const disponibles = imagenes.filter(i => !usadas.has(i));
+    const disponibles = imagenes.filter(i=>!usadas.has(i));
 
-   actuales = [...disponibles]
-    .sort(() => Math.random() - 0.5)
-    .slice(0,1);
+    actuales = [...disponibles]
+        .sort(()=>Math.random()-0.5)
+        .slice(0,1);
 
-    actuales.forEach(i => usadas.add(i));
+    actuales.forEach(i=>usadas.add(i));
 
     render();
 }
 
-// Renderizar tarjetas
+// Mostrar tarjeta
 function render(){
 
     const grid = document.getElementById("grid");
-    grid.innerHTML = "";
+    grid.innerHTML="";
 
     document.getElementById("info").innerText =
-        `Restantes: ${imagenes.length - usadas.size}`;
+        `Осталось: ${imagenes.length-usadas.size}`;
 
-    actuales.forEach((img, index)=>{
+    actuales.forEach((img,index)=>{
 
-        const nombre = img.replace(/\.[^.]+$/, "");
+        const nombre = img.replace(/\.[^.]+$/,"");
 
-        grid.innerHTML += `
-        <div class="card">
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "card";
+
+        tarjeta.innerHTML = `
             <img src="${carpeta}${img}">
             <br>
-            <input id="inp${index}" oninput="verificar(${index}, '${nombre}')">
-        </div>
+            <input 
+                id="inp${index}" 
+                type="text"
+                autocomplete="off"
+                placeholder="Введите слово"
+            >
         `;
+
+        grid.appendChild(tarjeta);
+
+        document.getElementById("inp"+index)
+        .addEventListener("input",function(){
+            verificar(index,nombre);
+        });
+
     });
 }
 
-// Verificación automática
-function verificar(index, correcta){
 
-    const input = document.getElementById("inp" + index);
-
-    if(normalizar(input.value) === normalizar(correcta)){
-        input.classList.add("correcto");
-        input.classList.remove("incorrecto");
-        input.disabled = true;
-
-        comprobarRonda();
-    }
-}
-
-// Ver si toda la ronda está completa
-function comprobarRonda(){
-
-    const inputs = document.querySelectorAll("input");
-
-    const todosCorrectos = [...inputs].every(i => i.disabled);
-
-    if(todosCorrectos){
-        setTimeout(() => {
-            siguienteRonda();
-        }, 600);
-    }
-}
-
-// SKIP
+// Saltar palabra
 function skip(){
 
-    actuales.forEach((img, index)=>{
-        const nombre = img.replace(/\.[^.]+$/, "");
-        const input = document.getElementById("inp" + index);
+    actuales.forEach((img,index)=>{
+
+        const nombre = img.replace(/\.[^.]+$/,"");
+        const input = document.getElementById("inp"+index);
 
         input.value = nombre;
         input.classList.add("incorrecto");
         input.disabled = true;
     });
 
-    setTimeout(() => {
+    setTimeout(()=>{
         siguienteRonda();
-    }, 1900);
+    },1900);
 }
 
 </script>
